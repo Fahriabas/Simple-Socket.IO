@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHATTING ROOM</title>
+    <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+    crossorigin="anonymous"
+  />
+</head>
+<body>
+    <!-- untuk login ceritanya -->
+    <div class="container border mt-4" style="height: auto;" id="loginContainer">
+        <h2>CHAT ROOM</h2>
+        <form action="" id="loginForm">
+            <input type="submit" class="btn btn-danger w-100" value="JOIN NOW" 
+            id="loginButton"
+            >
+        </form>
+    </div>
+
+    <!-- ini untuk chatting ceritanya -->
+    <div class="container mt-4" style="height: auto;" id="chatContainer">
+        <h3>DISKUSI TERBUKA</h3>
+        <form action="" id="chatForm">
+            <div id="messageList" style="height: 400px;" class="border p-4"></div>
+            <input type="text" class="w-100 form-control mt-2" name="" id="message">
+            <input type="submit" class="btn btn-danger w-100 mt-2" value="SEND" id="sendMessage">
+        </form>
+    </div>
+    <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+    crossorigin="anonymous"
+  ></script>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    const socket = io()
+    const chatContainer = document.getElementById("chatContainer")
+    const loginContainer = document.getElementById("loginContainer")
+    const message = document.getElementById("message")
+    const sendMessage = document.getElementById("sendMessage")
+    const messageList = document.getElementById("messageList")
+
+    chatContainer.style.display = "none"
+    loginButton.addEventListener("click", (e) =>{
+        e.preventDefault();
+        chatContainer.style.display = "block"
+        loginContainer.style.display = "none"
+    })
+
+    sendMessage.addEventListener("click", (e) => {
+        e.preventDefault();
+        if(message.value){
+            const data = {
+                id: socket.id,
+                message: message.value
+            }
+            socket.emit("message", data)
+            let chatList = document.createElement("p")
+            chatList.style.fontSize = "24px"
+            chatList.textContent = message.value
+            messageList.appendChild(chatList)
+            message.value = ""
+        }
+    })
+
+    socket.on("message", ( id, message ) => {
+        let broadCast = document.createElement("p")//ini diisi p karena kita mau membuat tag element <p><p/>
+            broadCast.style.textAlign = "right"
+            broadCast.style.fontSize = "24px"
+            broadCast.textContent = `${message} * (${id})`
+            messageList.appendChild(broadCast)
+    })
+  </script>
+</body>
+</html>
